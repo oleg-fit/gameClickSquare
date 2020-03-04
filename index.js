@@ -4,21 +4,31 @@ var $time = document.querySelector('#time');
 var $result = document.querySelector('#result');
 var $timeHeader = document.querySelector('#time-header');
 var $resultHeader = document.querySelector('#result-header');
+var $gameTime = document.querySelector('#game-time');
 
+var colors = ['red', 'blue', 'green', 'yellow', 'pink'];
 var score = 0;
 var isGameStarted = false;
 
 $start.addEventListener('click', startGame);
 $game.addEventListener('click', handleBoxClick);
+$gameTime.addEventListener('input', setGameTime);
+
+function show($el) {
+    $el.classList.remove('hide');
+}
+
+function hide($el) {
+    $el.classList.add('hide');
+}
 
 function startGame () {
     score = 0;
     setGameTime();
-    $timeHeader.classList.remove('hide');
-    $resultHeader.classList.add('hide');
+    $gameTime.setAttribute('disabled', 'true');
     isGameStarted = true;
     $game.style.backgroundColor = '#fff';
-    $start.classList.add('hide');
+    hide($start);
 
     var interval = setInterval(function () {
         var time = parseFloat($time.textContent);
@@ -29,9 +39,7 @@ function startGame () {
         } else {
             $time.textContent = (time - 0.1).toFixed(1);
         } 
-
     }, 100);
-
     renderBox ();
 }
 
@@ -40,19 +48,21 @@ function setGameScore() {
 }
 
 function setGameTime() {
-    var time = 5;
-
+    var time = +$gameTime.value;
     $time.textContent = time.toFixed(1);
+    show($timeHeader);
+    hide($resultHeader);
 }
 
 function endGame () {
     isGameStarted = false;
     setGameScore();
-    $start.classList.remove('hide');
+    $gameTime.removeAttribute('disabled');
+    show($start);
     $game.innerHTML = '';
     $game.style.backgroundColor = '#ccc';
-    $timeHeader.classList.add('hide');
-    $resultHeader.classList.remove('hide');
+    hide($timeHeader);
+    show($resultHeader);
 } 
 
 function handleBoxClick (event) {
@@ -73,13 +83,14 @@ function renderBox () {
     var gameSize = $game.getBoundingClientRect();
     var maxTop = gameSize.height - boxSize;
     var maxLeft = gameSize.width - boxSize;
+    var randomColorIndex = getRandom(0, colors.length - 1);
 
     box.style.height = boxSize + 'px';
     box.style.width = boxSize + 'px';
     box.style.position = 'absolute';
     box.style.top = getRandom(0, maxTop) + 'px';
     box.style.left = getRandom(0, maxLeft) + 'px';
-    box.style.backgroundColor = '#000';
+    box.style.backgroundColor = colors[randomColorIndex];
     box.style.cursor = 'pointer';
     box.setAttribute('data-box', 'true');
     
